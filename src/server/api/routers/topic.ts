@@ -23,8 +23,16 @@ export const topicRouter = createTRPCRouter({
                 userId: ctx.session.user.id
             }
         })
-
-    })
+    }),
+    deleteTopic: protectedProcedure
+    .input(z.object({id: z.string()}))
+    .mutation(async ({ ctx, input }) => {
+            return ctx.prisma.topic.delete({
+                where:{
+                    id: input.id,
+                }
+            });
+          }),
 //   hello: publicProcedure
 //     .input(z.object({ text: z.string() }))
 //     .query(({ input }) => {

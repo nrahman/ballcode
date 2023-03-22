@@ -57,6 +57,14 @@ const Content: React.FC = () => {
     }
   })
 
+  const deleteTopic = api.topic.deleteTopic.useMutation({
+    onSuccess:()=>{
+      void refetchTopics()
+      setSelectedTopic(null)
+
+    }
+  })
+
   const { data: notes, refetch: refetchNotes} = api.note.getAll.useQuery(
    {
     topicId: selectedTopic?.id ?? ""
@@ -78,27 +86,31 @@ const Content: React.FC = () => {
     }
   })
     return (
-      <div className="mx-5 mt-5 grid grid-cols-4 gap-2">
+      <div className="mx-5 mt-5 md:grid md:grid-cols-4 gap-2">
         <div className="px-2">
-          <ul className="menu rounded-box w-56 bg-base-100 p-2">
+          <h1 className="text-xl uppercase font-thin py-4 text-center">Topics</h1>
+          <ul className="menu rounded-box bg-base-100 p-2">
             {topics?.map((topic)=>(
-              <li key={topic.id}>
+              <li key={topic.id} className="flex flex-row flex-nowrap justify-between items-center">
                 <a 
+                className=""
                 href="#"
                 onClick={(evt)=>{
                   evt.preventDefault()
-                setSelectedTopic(topic)                }}
+                setSelectedTopic(topic) }}
                 
                 >{topic.title}</a>
-                </li>
+                <button
+                onClick={()=>void deleteTopic.mutate({id:topic.id})}
+                className="btn-warning btn-xs uppercase px-5 font-bold">Delete</button></li>
             )
 
             )}
           </ul>
           <input
             type="text"
-            placeholder="New topic"
-            className="input-bordered input input-sm w-fu"
+            placeholder="Add New topic"
+            className="input-bordered input md:input-sm w-full"
             onKeyDown={(e)=>{
               if(e.key === "Enter"){
                 createTopic.mutate({
@@ -110,6 +122,8 @@ const Content: React.FC = () => {
             />
         </div>
         <div className="col-span-3">
+          <h2 className="text-lg py-4 uppercase font-thin text-center underline">Notes</h2>
+            <h1 className="text-md text-center">{selectedTopic?.title}</h1>
           <div>
             {notes?.map((note)=>(
               <div key={note.id} className="mt-5">
